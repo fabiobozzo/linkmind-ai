@@ -1,4 +1,5 @@
 import argparse
+import multiprocessing
 
 from scrape.repository import Repository
 from scrape.scraper import Scraper
@@ -32,8 +33,7 @@ def main():
     args = parser.parse_args()
 
     if args.command == "scrape":
-        repo = Repository(args.root)
-        scraper = Scraper(repo, args.sources)
+        scraper = Scraper(args.sources, args.root)
         scraper.run()
     elif args.command == "model":
         print("TODO")
