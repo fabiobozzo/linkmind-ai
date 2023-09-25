@@ -1,5 +1,6 @@
 import json
 import os
+import time
 
 from scrape import utils
 
@@ -30,6 +31,6 @@ class Repository:
             if utils.short_hash(title) in self._index:
                 return
             with open(file_path, "w") as article_file:
-                print("new: " + file_path)
+                # print("store_article: " + file_path)
                 article_file.write(content)
-                self._index[utils.short_hash(title)] = True
+                self._index[utils.short_hash(title)] = time.time()
