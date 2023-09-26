@@ -20,17 +20,16 @@ class Repository:
         with open(self._index_path, "w") as index_file:
             json.dump(self._index, index_file)
 
-    def store_article(self, title, content):
+    def store_article(self, title, content) -> bool:
         if len(title.strip()) == 0:
-            return
-
+            return False
         title = utils.snake(title.lower())
-
         if len(content.strip()) > 0:
             file_path = os.path.join(self._root_folder, title)
             if utils.short_hash(title) in self._index:
-                return
+                return False
             with open(file_path, "w") as article_file:
                 # print("store_article: " + file_path)
                 article_file.write(content)
                 self._index[utils.short_hash(title)] = time.time()
+        return True

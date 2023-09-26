@@ -50,12 +50,12 @@ class Scraper:
         for link in page_links:
             article = self._retrieve_article(link, s['articleTag'], s['articleClass'], headers=headers)
             if article is not None:
-                repo.store_article(article['title'], article['content'])
-                count += 1
+                if repo.store_article(article['title'], article['content']):
+                    count += 1
 
         repo.dump_index()
 
-        print(f"scraping complete. {s['category']}::{s['url']} articles:{count}")
+        print(f"scraping complete. {s['category']}::{s['url']} new articles:{count}")
 
     def _find_page_links(self, url, depth=1, max_depth=1, link_class="", headers=None) -> set[str]:
         links = set()
@@ -109,10 +109,9 @@ class Scraper:
 
             # text preprocessing steps
             text = text.strip()
+            title = soup.find('title').string
 
-            return {
-                "title": soup.find('title').string,
-                "content": text
-            }
-        else:
-            return None
+            if text and title:
+                return {"title": title, "content": text}
+
+        return None

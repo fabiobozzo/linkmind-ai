@@ -20,14 +20,14 @@ def main():
         "-s",
         help="The file path containing the list of web resources to scrape",
         nargs='?',
-        default='./sources.csv'
+        default='./resources/sources.csv'
     )
     parser.add_argument(
         "--categories",
         "-c",
         help="The file path containing the list of web categories",
         nargs='?',
-        default='./categories.csv'
+        default='./resources/categories.csv'
     )
 
     args = parser.parse_args()

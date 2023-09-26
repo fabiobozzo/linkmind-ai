@@ -3,7 +3,6 @@ category,uri,link_class,article_tag,article_class,max_depth,headers
 "news_info","https://www.bbc.com/news","gs-c-promo-heading","article","",1,
 "news_info","https://www.reuters.com","","article","",1,
 "tech_science","https://www.wired.com","","article","article",2,
-"tech_science","https://techcrunch.com","","article","",3,
 "tech_science","https://scisoup.org","","div","container",1,
 "tech_science","https://www.cnet.com","","div","c-pageArticle",2,
 "entertainment","https://www.ew.com","","div","articleContainer",1,
