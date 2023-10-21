@@ -1,7 +1,6 @@
 import argparse
-import multiprocessing
 
-from scrape.repository import Repository
+from ml.model import ModelBuilder
 from scrape.scraper import Scraper
 
 
@@ -36,7 +35,8 @@ def main():
         scraper = Scraper(args.sources, args.root)
         scraper.run()
     elif args.command == "model":
-        print("TODO")
+        model_builder = ModelBuilder(args.categories, args.root, 1000)
+        model_builder.build()
 
 
 if __name__ == "__main__":
