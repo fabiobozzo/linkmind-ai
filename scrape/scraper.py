@@ -50,7 +50,7 @@ class Scraper:
 
         count = 0
         for link in page_links:
-            article = self._retrieve_article(link, s['articleTag'], s['articleClass'], headers=headers)
+            article = retrieve_content(link, s['articleTag'], s['articleClass'], headers=headers)
             if article is not None:
                 if repo.store_article(article['title'], article['content']):
                     count += 1
@@ -87,32 +87,33 @@ class Scraper:
 
         return links
 
-    def _retrieve_article(self, url, article_tag, article_class="", headers=None) -> dict | None:
-        try:
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()
-        except requests.exceptions.RequestException as e:
-            # logging.error(f"http error: GET {url}", e, exc_info=True)
-            return None
 
-        soup = BeautifulSoup(response.content, "html.parser")
-
-        article_find_all_kwargs = {}
-        if len(article_class) > 0:
-            article_find_all_kwargs['class_'] = article_class
-        article = soup.find(article_tag, **article_find_all_kwargs)  # Extract article content
-        if article:
-            paragraphs = article.find_all("p")
-            if len(paragraphs) > 0:
-                text = " ".join(p.get_text() for p in paragraphs)
-            else:
-                text = article.get_text()
-
-            # text preprocessing steps
-            text = text.strip()
-            title = soup.find('title').string
-
-            if text and title:
-                return {"title": title, "content": text}
-
+def retrieve_content(url, element_tag, element_class="", headers=None) -> dict | None:
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        # logging.error(f"http error: GET {url}", e, exc_info=True)
         return None
+
+    soup = BeautifulSoup(response.content, "html.parser")
+
+    article_find_all_kwargs = {}
+    if len(element_class) > 0:
+        article_find_all_kwargs['class_'] = element_class
+    article = soup.find(element_tag, **article_find_all_kwargs)  # Extract article content
+    if article:
+        paragraphs = article.find_all("p")
+        if len(paragraphs) > 0:
+            text = " ".join(p.get_text() for p in paragraphs)
+        else:
+            text = article.get_text()
+
+        # text preprocessing steps
+        text = text.strip()
+        title = soup.find('title').string
+
+        if text and title:
+            return {"title": title, "content": text}
+
+    return None
