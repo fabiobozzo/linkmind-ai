@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 from ml.model import ModelBuilder
 from scrape.scraper import Scraper
@@ -30,6 +31,13 @@ def main():
     )
 
     args = parser.parse_args()
+
+    logging.basicConfig(
+        filename=f"{args.command}.log",
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)s] %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
 
     if args.command == "scrape":
         scraper = Scraper(args.sources, args.root)

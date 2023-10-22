@@ -1,4 +1,5 @@
 import json
+import logging
 import multiprocessing
 import os
 
@@ -23,6 +24,7 @@ class Scraper:
         self._root_folder_path = root_folder_path
 
     def run(self):
+        logging.info(f"scraping of {len(self._sources)} has started")
         num_workers = multiprocessing.cpu_count()
         with multiprocessing.Pool(num_workers) as pool:
             pool.map(self._scrape_source, self._sources)
@@ -44,7 +46,7 @@ class Scraper:
             link_class=s['linkClass'],
             headers=headers
         )
-        print(f"{s['url']} links:{len(page_links)}")
+        logging.info(f"found {len(page_links)} links for source {s['url']} ({s['category']})")
 
         count = 0
         for link in page_links:
@@ -55,7 +57,7 @@ class Scraper:
 
         repo.dump_index()
 
-        print(f"scraping complete. {s['category']}::{s['url']} new articles:{count}")
+        logging.info(f"scraped {count} articles for source {s['url']} ({s['category']}) ✓")
 
     def _find_page_links(self, url, depth=1, max_depth=1, link_class="", headers=None) -> set[str]:
         links = set()
@@ -64,7 +66,7 @@ class Scraper:
             response = requests.get(url, headers=headers)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            # print(f"GET {url} failed with {e}")
+            logging.error(f"http error: GET {url}", e, exc_info=True)
             return links
 
         soup = BeautifulSoup(response.content, "html.parser")
@@ -87,11 +89,10 @@ class Scraper:
 
     def _retrieve_article(self, url, article_tag, article_class="", headers=None) -> dict | None:
         try:
-            # print(f"GET {url}")
             response = requests.get(url, headers=headers)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            # print(f"GET {url} failed with {e}")
+            # logging.error(f"http error: GET {url}", e, exc_info=True)
             return None
 
         soup = BeautifulSoup(response.content, "html.parser")
