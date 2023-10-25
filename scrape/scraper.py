@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from scrape import utils, config
-from data.repository import Repository
+from scrape.repository import Repository
 
 default_http_headers = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0",
@@ -24,7 +24,7 @@ class Scraper:
         self._root_folder_path = root_folder_path
 
     def run(self):
-        logging.info(f"scraping of {len(self._sources)} has started")
+        logging.info(f"scraping of {len(self._sources)} sources has started")
         num_workers = multiprocessing.cpu_count()
         with multiprocessing.Pool(num_workers) as pool:
             pool.map(self._scrape_source, self._sources)
@@ -46,7 +46,7 @@ class Scraper:
             link_class=s['linkClass'],
             headers=headers
         )
-        logging.info(f"found {len(page_links)} links for source {s['url']} ({s['category']})")
+        logging.debug(f"found {len(page_links)} links for source {s['url']} ({s['category']})")
 
         count = 0
         for link in page_links:
@@ -57,7 +57,7 @@ class Scraper:
 
         repo.dump_index()
 
-        logging.info(f"scraped {count} articles for source {s['url']} ({s['category']}) ✓")
+        logging.debug(f"scraped {count} articles for source {s['url']} ({s['category']}) ✓")
 
     def _find_page_links(self, url, depth=1, max_depth=1, link_class="", headers=None) -> set[str]:
         links = set()
@@ -66,7 +66,7 @@ class Scraper:
             response = requests.get(url, headers=headers)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            logging.error(f"http error: GET {url}", e, exc_info=True)
+            # logging.error(f"http error:{response.status_code} GET {url}")
             return links
 
         soup = BeautifulSoup(response.content, "html.parser")
@@ -88,7 +88,10 @@ class Scraper:
         return links
 
 
-def retrieve_content(url, element_tag, element_class="", headers=None) -> dict | None:
+def retrieve_content(url, element_tag, element_class="", headers=None):
+    if not headers:
+        headers = default_http_headers
+
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
@@ -103,10 +106,12 @@ def retrieve_content(url, element_tag, element_class="", headers=None) -> dict |
         article_find_all_kwargs['class_'] = element_class
     article = soup.find(element_tag, **article_find_all_kwargs)  # Extract article content
     if article:
+        text = ''
         paragraphs = article.find_all("p")
         if len(paragraphs) > 0:
             text = " ".join(p.get_text() for p in paragraphs)
-        else:
+
+        if text.strip() == '':
             text = article.get_text()
 
         # text preprocessing steps

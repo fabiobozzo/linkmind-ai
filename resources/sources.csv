@@ -3,7 +3,7 @@ category,uri,link_class,article_tag,article_class,max_depth,headers
 "art_culture","https://www.artsy.net","","main","cwWlls",2,
 "art_culture","https://www.bbc.com/culture/columns/art","","article","article__body",1,
 "art_culture","https://www.metmuseum.org","","main","",2,
-"art_culture","https://www.openculture.com","","div","contentwrapper",2,
+"art_culture","https://www.thisiscolossal.com","","main","entry-content",2,
 "automotive","https://www.autoexpress.co.uk","","main","",2,
 "automotive","https://www.caranddriver.com","","main","",2,
 "automotive","https://www.motortrend.com","","article","",2,
