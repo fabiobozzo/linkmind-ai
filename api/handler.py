@@ -23,10 +23,13 @@ class Response(BaseModel):
 
 
 app = FastAPI(title="Linkmind AI")
-settings = Settings()
 
 
-def load_model() -> ModelReader:
+def load_settings() -> Settings:
+    return Settings()
+
+
+def load_model(settings: Settings = Depends(load_settings)) -> ModelReader:
     return ModelReader(settings.categories_filepath, settings.root_path)
 
 

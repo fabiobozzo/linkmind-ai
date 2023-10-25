@@ -1,7 +1,10 @@
 import argparse
 import logging
+import os
+
 import multiprocessing_logging
-import uvicorn as uvicorn
+import uvicorn
+from dotenv import load_dotenv
 
 import api.handler
 from model.builder import ModelBuilder
@@ -10,30 +13,17 @@ from scrape.scraper import Scraper, retrieve_content
 
 
 def main():
+    load_dotenv()
+
     parser = argparse.ArgumentParser(description="LinkMind CLI")
     parser.add_argument("command", choices=["scrape", "model", "classify", "api"], help="Command to execute")
     parser.add_argument("url", help="URL to scrape and classify", nargs="?")
-    parser.add_argument(
-        "--root-path",
-        "-rp",
-        help="The directory where the scraped web contents are saved",
-        nargs='?',
-        default='/tmp/linkmind'
-    )
-    parser.add_argument(
-        "--sources-filepath",
-        "-sp",
-        help="The file path containing the list of web resources to scrape",
-        nargs='?',
-        default='./resources/sources.csv'
-    )
-    parser.add_argument(
-        "--categories-filepath",
-        "-cp",
-        help="The file path containing the list of web categories",
-        nargs='?',
-        default='./resources/categories.csv'
-    )
+    parser.add_argument("--root-path", default=os.environ.get("ROOT_PATH"),
+                        help="The directory where the scraped web contents are saved", nargs='?')
+    parser.add_argument("--sources-filepath", default=os.environ.get("SOURCES_FILEPATH"),
+                        help="The file path containing the list of web resources to scrape", nargs='?')
+    parser.add_argument("--categories-filepath", default=os.environ.get("CATEGORIES_FILEPATH"),
+                        help="The file path containing the list of web categories", nargs='?')
     args = parser.parse_args()
 
     logging.basicConfig(
